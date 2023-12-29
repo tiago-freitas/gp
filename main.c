@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include <SDL2/SDL.h>
 
@@ -11,6 +12,12 @@
 
 #define CELL_WIDTH ((float) SCREEN_WIDTH / BOARD_WIDTH)
 #define CELL_HEIGHT ((float) SCREEN_HEIGHT / BOARD_HEIGHT)
+
+#define AGENTS_COUNT 5
+
+#define BACKGROUND_COLOR "181818ff"
+#define GRID_COLOR "5a5a5aff"
+#define AGENT_COLOR "5f0910ff"
 
 int scc(int code)
 {
@@ -101,12 +108,48 @@ void render_grid_board(SDL_Renderer *renderer)
                 SCREEN_WIDTH,
                 CELL_HEIGHT * y));
     }
+}
 
-    //     for (int y = 0; y < BOARD_HEIGHT; ++y) {
-    //         SDL_RenderDrawLine(renderer,
-    //                            int x1, int y1, int x2, int y2);
-    //     }
-    // }
+int random_int_range(int low, int high)
+{
+    return rand() % (high - low) + low;
+}
+
+Dir random_dir(void)
+{
+    return (Dir) random_int_range(0, 4);
+}
+
+Agent random_agent(void)
+{
+    Agent agent  = {0};
+    agent.pos_x  = random_int_range(0, BOARD_WIDTH);
+    agent.pos_y  = random_int_range(0, BOARD_HEIGHT);
+    agent.dir    = random_dir();
+    agent.hunger = 100;
+    agent.health = 100;
+
+    return agent;
+}
+
+void init_agents(void)
+{
+    for (size_t i = 0; i < AGENTS_COUNT; ++i) {
+        agents[i] = random_agent();
+    }
+}
+
+void render_agent(SDL_Renderer *renderer, Agent agent)
+{
+    SDL_SetRenderDrawColor(renderer, AGENT_COLOR);
+    
+}
+
+void render_all_agents(SDL_Renderer *renderer)
+{
+    for (size_t i = 0; i < AGENTS_COUNT; ++i) {
+        render_agent(renderer, agents[i]);
+    }
 }
 
 int main(void)
@@ -129,6 +172,8 @@ int main(void)
             SCREEN_WIDTH,
             SCREEN_HEIGHT));
 
+    init_agents();
+
     int quit = 0;
     while (!quit) {
         SDL_Event event;
@@ -140,7 +185,7 @@ int main(void)
             }
         }
 
-        scc(SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255));
+        sdl_set_color_hex(renderer, BACKGROUND_COLOR);
         scc(SDL_RenderClear(renderer));
 
         render_grid_board(renderer);
@@ -148,8 +193,6 @@ int main(void)
         SDL_RenderPresent(renderer);
  
     }
-
-
 
     SDL_Quit();
     return 0;
