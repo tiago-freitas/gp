@@ -4,6 +4,8 @@
 
 #include <SDL2/SDL.h>
 
+#include "./style.h"
+
 #define BOARD_WIDTH  10
 #define BOARD_HEIGHT 10
 
@@ -14,10 +16,6 @@
 #define CELL_HEIGHT ((float) SCREEN_HEIGHT / BOARD_HEIGHT)
 
 #define AGENTS_COUNT 5
-
-#define BACKGROUND_COLOR "181818ff"
-#define GRID_COLOR "5a5a5aff"
-#define AGENT_COLOR "5f0910ff"
 
 int scc(int code)
 {
@@ -39,30 +37,30 @@ void *scp(void *ptr)
     return ptr;
 }
 
-Uint8 hex_to_dec(char x)
-{
-    if ('0' <= x && x <= '9') return x - '0';
-    if ('a' <= x && x <= 'f') return x - 'a' + 10;
-    if ('A' <= x && x <= 'F') return x - 'A' + 10;
-    printf("ERROR: Incorrect hex character %c\n", x);
-    exit(1);
-}
+// Uint8 hex_to_dec(char x)
+// {
+//     if ('0' <= x && x <= '9') return x - '0';
+//     if ('a' <= x && x <= 'f') return x - 'a' + 10;
+//     if ('A' <= x && x <= 'F') return x - 'A' + 10;
+//     printf("ERROR: Incorrect hex character %c\n", x);
+//     exit(1);
+// }
 
-Uint8 parse_hex_byte(const char *byte_hex)
-{
-    return hex_to_dec(*byte_hex) * 0x10 + hex_to_dec(*(byte_hex + 1));
-}
+// Uint8 parse_hex_byte(const char *byte_hex)
+// {
+//     return hex_to_dec(*byte_hex) * 0x10 + hex_to_dec(*(byte_hex + 1));
+// }
 
-void sdl_set_color_hex(SDL_Renderer *renderer, const char *hex)
+void sdl_set_color_hex(SDL_Renderer *renderer, int hex)
 {
-    size_t hex_len  = strlen(hex);
-    assert(hex_len == 8);
+    int r = hex >> 24;
+    int g = (hex >> 16) % 0x100;
+    int b = (hex >> 8) % 0x100;
+    int a = hex % 0x100;
+
     scc(SDL_SetRenderDrawColor(
             renderer,
-            parse_hex_byte(hex),
-            parse_hex_byte(hex + 2),
-            parse_hex_byte(hex + 4),
-            parse_hex_byte(hex + 6)));
+            r, g, b, a));
 }
 
 typedef enum {
@@ -141,8 +139,17 @@ void init_agents(void)
 
 void render_agent(SDL_Renderer *renderer, Agent agent)
 {
-    SDL_SetRenderDrawColor(renderer, AGENT_COLOR);
-    
+    sdl_set_color_hex(renderer, AGENT_COLOR);
+
+    SDL_Rect rect = {
+        (int) floorf(agent.pos_x * CELL_WIDTH)  + 1,
+        (int) floorf(agent.pos_y * CELL_HEIGHT) + 1,
+        (int) floorf(CELL_WIDTH)  - 1,
+        (int) floorf(CELL_HEIGHT) - 1,
+    };
+
+    scc(SDL_RenderFillRect(renderer, &rect));
+
 }
 
 void render_all_agents(SDL_Renderer *renderer)
@@ -189,6 +196,7 @@ int main(void)
         scc(SDL_RenderClear(renderer));
 
         render_grid_board(renderer);
+        render_all_agents(renderer);
 
         SDL_RenderPresent(renderer);
  
