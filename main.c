@@ -32,9 +32,58 @@ void *scp(void *ptr)
     return ptr;
 }
 
+Uint8 hex_to_dec(char x)
+{
+    if ('0' <= x && x <= '9') return x - '0';
+    if ('a' <= x && x <= 'f') return x - 'a' + 10;
+    if ('A' <= x && x <= 'F') return x - 'A' + 10;
+    printf("ERROR: Incorrect hex character %c\n", x);
+    exit(1);
+}
+
+Uint8 parse_hex_byte(const char *byte_hex)
+{
+    return hex_to_dec(*byte_hex) * 0x10 + hex_to_dec(*(byte_hex + 1));
+}
+
+void sdl_set_color_hex(SDL_Renderer *renderer, const char *hex)
+{
+    size_t hex_len  = strlen(hex);
+    assert(hex_len == 8);
+    scc(SDL_SetRenderDrawColor(
+            renderer,
+            parse_hex_byte(hex),
+            parse_hex_byte(hex + 2),
+            parse_hex_byte(hex + 4),
+            parse_hex_byte(hex + 6)));
+}
+
+typedef enum {
+    DIR_RIGHT = 0,
+    DIR_UP,
+    DIR_LEFT,
+    DIR_DOWN,
+} Dir;
+
+typedef struct {
+    int pos_x, pos_y;
+    Dir dir;
+    int hunger;
+    int health;
+} Agent;
+
+typedef enum {
+    ACTION_NOP = 0,
+    ACTION_STEP,
+    ACTION_EAT,
+    ACTION_ATTACK,
+} Action;
+
+Agent agents[AGENTS_COUNT];
+
 void render_grid_board(SDL_Renderer *renderer)
 {
-    scc(SDL_SetRenderDrawColor(renderer, 90, 90, 90, 255));
+    sdl_set_color_hex(renderer, GRID_COLOR);
     for (int x = 1; x < BOARD_WIDTH; ++x) {
         scc(SDL_RenderDrawLine(
                 renderer,
