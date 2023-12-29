@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 
 #include "./style.h"
+#include "./triangle.h"
 
 #define BOARD_WIDTH  10
 #define BOARD_HEIGHT 10
@@ -37,26 +38,12 @@ void *scp(void *ptr)
     return ptr;
 }
 
-// Uint8 hex_to_dec(char x)
-// {
-//     if ('0' <= x && x <= '9') return x - '0';
-//     if ('a' <= x && x <= 'f') return x - 'a' + 10;
-//     if ('A' <= x && x <= 'F') return x - 'A' + 10;
-//     printf("ERROR: Incorrect hex character %c\n", x);
-//     exit(1);
-// }
-
-// Uint8 parse_hex_byte(const char *byte_hex)
-// {
-//     return hex_to_dec(*byte_hex) * 0x10 + hex_to_dec(*(byte_hex + 1));
-// }
-
-void sdl_set_color_hex(SDL_Renderer *renderer, int hex)
+void sdl_set_color_hex(SDL_Renderer *renderer, Uint32 hex)
 {
-    int r = hex >> 24;
-    int g = (hex >> 16) % 0x100;
-    int b = (hex >> 8) % 0x100;
-    int a = hex % 0x100;
+    int r =  hex >> 24;
+    int g = (hex >> 16) & 0xFF;
+    int b = (hex >> 8) & 0xFF;
+    int a =  hex & 0xFF;
 
     scc(SDL_SetRenderDrawColor(
             renderer,
@@ -137,15 +124,16 @@ void init_agents(void)
     }
 }
 
+#define AGENT_PADDING 20
+
 void render_agent(SDL_Renderer *renderer, Agent agent)
 {
     sdl_set_color_hex(renderer, AGENT_COLOR);
-
     SDL_Rect rect = {
-        (int) floorf(agent.pos_x * CELL_WIDTH)  + 1,
-        (int) floorf(agent.pos_y * CELL_HEIGHT) + 1,
-        (int) floorf(CELL_WIDTH)  - 1,
-        (int) floorf(CELL_HEIGHT) - 1,
+        (int) floorf(agent.pos_x * CELL_WIDTH)  + AGENT_PADDING,
+        (int) floorf(agent.pos_y * CELL_HEIGHT) + AGENT_PADDING,
+        (int) floorf(CELL_WIDTH)  - AGENT_PADDING * 2 + 2,
+        (int) floorf(CELL_HEIGHT) - AGENT_PADDING * 2 + 2,
     };
 
     scc(SDL_RenderFillRect(renderer, &rect));
