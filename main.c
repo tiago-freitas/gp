@@ -19,6 +19,9 @@
 #define AGENTS_COUNT 4
 #define AGENT_PADDING 15.0f
 
+#define FOODS_COUNT 4
+#define WALL_COUNT 4
+
 int scc(int code)
 {
     if (code < 0) {
@@ -69,12 +72,14 @@ float agents_dirs[4][6] = {
     {0.0, 0.0, 1.0, 0.0, 0.5, 1.0},
 };
 
-typedef struct {
-    int pos_x, pos_y;
-    Dir dir;
-    int hunger;
-    int health;
-} Agent;
+typedef int State;
+
+typedef enum {
+    ENV_NOTHING = 0,
+    ENV_AGENT,
+    ENV_FOOD,
+    ENV_WALL,
+} Env;
 
 typedef enum {
     ACTION_NOP = 0,
@@ -83,7 +88,43 @@ typedef enum {
     ACTION_ATTACK,
 } Action;
 
-Agent agents[AGENTS_COUNT];
+typedef struct {
+    State state;
+    Env env;
+    Action action;
+    State next_state;
+} Brain_Cell;
+
+typedef struct {
+    size_t count;
+    Brain_Cell cells[];
+} Brain;
+
+typedef struct {
+    int pos_x, pos_y;
+    Dir dir;
+    int hunger;
+    int health;
+    State state;
+} Agent;
+
+
+typedef struct {
+    int eaten;
+    int pos_x;
+    int pos_y;
+} Food;
+
+typedef struct {
+    int pos_x;
+    int pos_y;
+} Wall;
+
+typedef struct {
+    Agent agents[AGENTS_COUNT];
+    Food foods[FOODS_COUNT];
+    Wall walls[WALL_COUNT];
+} Game;
 
 void render_grid_board(SDL_Renderer *renderer)
 {
@@ -129,19 +170,8 @@ Agent random_agent(void)
     return agent;
 }
 
-void init_agents(void)
-{
-    for (size_t i = 0; i < AGENTS_COUNT; ++i) {
-        agents[i] = random_agent();
-        agents[i].dir = i;
-    }
-}
-
-
 void render_agent(SDL_Renderer *renderer, Agent agent)
 {
-
-
     // scale and shift
     Sint16 x1 = agents_dirs[agent.dir][0] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent.pos_x * CELL_WIDTH + AGENT_PADDING;
     Sint16 y1 = agents_dirs[agent.dir][1] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent.pos_y * CELL_HEIGHT + AGENT_PADDING;
@@ -154,17 +184,29 @@ void render_agent(SDL_Renderer *renderer, Agent agent)
     aatrigonColor(renderer, x1, y1, x2, y2, x3, y3, AGENT_COLOR);
 }
 
-void render_all_agents(SDL_Renderer *renderer)
+void render_game(SDL_Renderer *renderer, const Game *game)
 {
     for (size_t i = 0; i < AGENTS_COUNT; ++i) {
-        render_agent(renderer, agents[i]);
+        render_agent(renderer, game->agents[i]);
+    }        
+}
+
+void init_game(Game *game)
+{
+    for (size_t i = 0; i < AGENTS_COUNT; ++i) {
+        game->agents[i] = random_agent();
+        game->agents[i].dir = i;
     }
 }
 
+Agent agents[AGENTS_COUNT];
+Game game = {0};
+
 int main(void)
 {
-    scc(SDL_Init(SDL_INIT_VIDEO));
+    init_game(&game);
 
+    scc(SDL_Init(SDL_INIT_VIDEO));
    
     SDL_Window *const window = scp(SDL_CreateWindow(
         "Hunger Games",
@@ -184,7 +226,6 @@ int main(void)
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
 
-    init_agents();
 
     int quit = 0;
     while (!quit) {
@@ -201,7 +242,7 @@ int main(void)
         scc(SDL_RenderClear(renderer));
 
         render_grid_board(renderer);
-        render_all_agents(renderer);
+        render_game(renderer, &game);
 
         SDL_RenderPresent(renderer);
         // quit = 1;
