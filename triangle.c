@@ -37,7 +37,7 @@ void fill_bottom_flat_triangle(SDL_Renderer *renderer, Triangle t) {
     float curx1 = t.x1;
     float curx2 = t.x1;
 
-    for (int scanline = t.y1; scanline < t.y2; scanline++) {
+    for (int scanline = t.y1; scanline <= t.y2; scanline++) {
         scc(SDL_RenderDrawLine(
                     renderer,
                     (int) roundf(curx1),
@@ -57,7 +57,7 @@ void fill_top_flat_triangle(SDL_Renderer *renderer, Triangle t) {
     
     float curx1 = t.x1;
     float curx2 = t.x2;
-    for (int scanline = t.y1; scanline < t.y3; scanline++) {
+    for (int scanline = t.y1; scanline <= t.y3; scanline++) {
         scc(SDL_RenderDrawLine(
                     renderer,
                     (int) roundf(curx1),

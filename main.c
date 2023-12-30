@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
+#include <SDL2_gfxPrimitives.h>
 
 #include "./style.h"
-#include "./triangle.h"
 
 #define BOARD_WIDTH  10
 #define BOARD_HEIGHT 10
@@ -16,7 +16,8 @@
 #define CELL_WIDTH ((float) SCREEN_WIDTH / BOARD_WIDTH)
 #define CELL_HEIGHT ((float) SCREEN_HEIGHT / BOARD_HEIGHT)
 
-#define AGENTS_COUNT 5
+#define AGENTS_COUNT 4
+#define AGENT_PADDING 15.0f
 
 int scc(int code)
 {
@@ -56,6 +57,17 @@ typedef enum {
     DIR_LEFT,
     DIR_DOWN,
 } Dir;
+
+float agents_dirs[4][6] = {
+    // DIR_RIGHT
+    {0.0, 0.0, 1.0, 0.5, 0.0, 1.0},
+    //DIR_UP
+    {0.0, 1.0, 0.5, 0.0, 1.0, 1.0},
+    // DIR_LEFT
+    {1.0, 0.0, 1.0, 1.0, 0.0, 0.5},
+    //DIR_DOWN,    
+    {0.0, 0.0, 1.0, 0.0, 0.5, 1.0},
+};
 
 typedef struct {
     int pos_x, pos_y;
@@ -121,23 +133,25 @@ void init_agents(void)
 {
     for (size_t i = 0; i < AGENTS_COUNT; ++i) {
         agents[i] = random_agent();
+        agents[i].dir = i;
     }
 }
 
-#define AGENT_PADDING 20
 
 void render_agent(SDL_Renderer *renderer, Agent agent)
 {
-    sdl_set_color_hex(renderer, AGENT_COLOR);
-    SDL_Rect rect = {
-        (int) floorf(agent.pos_x * CELL_WIDTH)  + AGENT_PADDING,
-        (int) floorf(agent.pos_y * CELL_HEIGHT) + AGENT_PADDING,
-        (int) floorf(CELL_WIDTH)  - AGENT_PADDING * 2 + 2,
-        (int) floorf(CELL_HEIGHT) - AGENT_PADDING * 2 + 2,
-    };
 
-    scc(SDL_RenderFillRect(renderer, &rect));
 
+    // scale and shift
+    Sint16 x1 = agents_dirs[agent.dir][0] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent.pos_x * CELL_WIDTH + AGENT_PADDING;
+    Sint16 y1 = agents_dirs[agent.dir][1] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent.pos_y * CELL_HEIGHT + AGENT_PADDING;
+    Sint16 x2 = agents_dirs[agent.dir][2] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent.pos_x * CELL_WIDTH + AGENT_PADDING;
+    Sint16 y2 = agents_dirs[agent.dir][3] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent.pos_y * CELL_HEIGHT + AGENT_PADDING;
+    Sint16 x3 = agents_dirs[agent.dir][4] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent.pos_x * CELL_WIDTH + AGENT_PADDING;
+    Sint16 y3 = agents_dirs[agent.dir][5] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent.pos_y * CELL_HEIGHT + AGENT_PADDING;
+
+    filledTrigonColor(renderer, x1, y1, x2, y2, x3, y3, AGENT_COLOR);
+    aatrigonColor(renderer, x1, y1, x2, y2, x3, y3, AGENT_COLOR);
 }
 
 void render_all_agents(SDL_Renderer *renderer)
@@ -147,18 +161,11 @@ void render_all_agents(SDL_Renderer *renderer)
     }
 }
 
-// # define M_PI       3.14159265358979323846
-
 int main(void)
 {
     scc(SDL_Init(SDL_INIT_VIDEO));
 
-    // Triangle t = {0, 3, 0, 0, 6, 2};
-    // Point pA = {A};
-    // Point pB = {B};
-    // Point pC = {C};
-    // printf("%f %f %f\n", angle(t, pA) * 180/M_PI, angle(t, pB) * 180/M_PI, angle(t, pC) * 180/M_PI);
-
+   
     SDL_Window *const window = scp(SDL_CreateWindow(
         "Hunger Games",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -174,6 +181,8 @@ int main(void)
             renderer,
             SCREEN_WIDTH,
             SCREEN_HEIGHT));
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
 
     init_agents();
 
@@ -191,12 +200,9 @@ int main(void)
         sdl_set_color_hex(renderer, BACKGROUND_COLOR);
         scc(SDL_RenderClear(renderer));
 
-        // render_grid_board(renderer);
-        // render_all_agents(renderer);
+        render_grid_board(renderer);
+        render_all_agents(renderer);
 
-        Triangle t = {173, 60, 150, 250, 506, 700};
-        sdl_set_color_hex(renderer, 0xDA2C38FF);
-        fill_triangle(renderer, t);
         SDL_RenderPresent(renderer);
         // quit = 1;
     }
