@@ -20,7 +20,7 @@
 #define AGENT_PADDING 15.0f
 
 #define FOODS_COUNT 4
-#define WALL_COUNT 4
+#define WALLS_COUNT 4
 
 int scc(int code)
 {
@@ -123,7 +123,7 @@ typedef struct {
 typedef struct {
     Agent agents[AGENTS_COUNT];
     Food foods[FOODS_COUNT];
-    Wall walls[WALL_COUNT];
+    Wall walls[WALLS_COUNT];
 } Game;
 
 void render_grid_board(SDL_Renderer *renderer)
@@ -184,10 +184,42 @@ void render_agent(SDL_Renderer *renderer, Agent agent)
     aatrigonColor(renderer, x1, y1, x2, y2, x3, y3, AGENT_COLOR);
 }
 
+void render_wall(SDL_Renderer *renderer, Wall wall)
+{
+    const SDL_Rect rect = {
+        (int) floorf(wall.pos_x * CELL_WIDTH),
+        (int) floorf(wall.pos_y * CELL_HEIGHT),
+        (int) floorf(CELL_WIDTH),
+        (int) floorf(CELL_HEIGHT),
+    };
+
+    sdl_set_color_hex(renderer, WALL_COLOR);
+
+    SDL_RenderFillRect(renderer, &rect);
+}
+
+void render_food(SDL_Renderer *renderer, Food food)
+{
+    int x = food.pos_x * CELL_WIDTH  + (CELL_WIDTH  * 0.5);
+    int y = food.pos_y * CELL_HEIGHT + (CELL_HEIGHT * 0.5);
+    int rad = 20;
+
+    aacircleColor(renderer, x, y, rad, FOOD_COLOR);
+    filledCircleColor(renderer, x, y, rad, FOOD_COLOR);
+}
+
 void render_game(SDL_Renderer *renderer, const Game *game)
 {
     for (size_t i = 0; i < AGENTS_COUNT; ++i) {
         render_agent(renderer, game->agents[i]);
+    }        
+
+    for (size_t i = 0; i < WALLS_COUNT; ++i) {
+        render_wall(renderer, game->walls[i]);
+    }        
+
+    for (size_t i = 0; i < FOODS_COUNT; ++i) {
+        render_food(renderer, game->foods[i]);
     }        
 }
 
@@ -197,9 +229,25 @@ void init_game(Game *game)
         game->agents[i] = random_agent();
         game->agents[i].dir = i;
     }
+
+    for (size_t i = 0; i < FOODS_COUNT; ++i) {
+        game->foods[i].pos_x = random_int_range(0, BOARD_WIDTH);
+        game->foods[i].pos_y = random_int_range(0, BOARD_HEIGHT);
+    }
+
+    for (size_t i = 0; i < WALLS_COUNT ; ++i) {
+        game->walls[i].pos_x = random_int_range(0, BOARD_WIDTH);
+        game->walls[i].pos_y = random_int_range(0, BOARD_HEIGHT);
+    }
 }
 
 Agent agents[AGENTS_COUNT];
+
+void step_game(Game *game)
+{
+    // TODO
+}
+
 Game game = {0};
 
 int main(void)
@@ -234,6 +282,13 @@ int main(void)
             switch (event.type) {
             case SDL_QUIT: {
                  quit = 1;
+            } break;
+            case SDL_KEYDOWN: {
+                switch (event.key.keysym.sym) {
+                case SDLK_SPACE: {
+                    step_game(&game);
+                } break;
+                }
             } break;
             }
         }
