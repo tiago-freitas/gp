@@ -147,9 +147,17 @@ void render_all_agents(SDL_Renderer *renderer)
     }
 }
 
+// # define M_PI       3.14159265358979323846
+
 int main(void)
 {
     scc(SDL_Init(SDL_INIT_VIDEO));
+
+    // Triangle t = {0, 3, 0, 0, 6, 2};
+    // Point pA = {A};
+    // Point pB = {B};
+    // Point pC = {C};
+    // printf("%f %f %f\n", angle(t, pA) * 180/M_PI, angle(t, pB) * 180/M_PI, angle(t, pC) * 180/M_PI);
 
     SDL_Window *const window = scp(SDL_CreateWindow(
         "Hunger Games",
@@ -174,20 +182,23 @@ int main(void)
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                case SDL_QUIT: {
-                    quit = 1;
-                } break;
+            case SDL_QUIT: {
+                 quit = 1;
+            } break;
             }
         }
 
         sdl_set_color_hex(renderer, BACKGROUND_COLOR);
         scc(SDL_RenderClear(renderer));
 
-        render_grid_board(renderer);
-        render_all_agents(renderer);
+        // render_grid_board(renderer);
+        // render_all_agents(renderer);
 
+        Triangle t = {173, 60, 150, 250, 506, 700};
+        sdl_set_color_hex(renderer, 0xDA2C38FF);
+        fill_triangle(renderer, t);
         SDL_RenderPresent(renderer);
- 
+        // quit = 1;
     }
 
     SDL_Quit();

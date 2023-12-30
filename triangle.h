@@ -11,4 +11,6 @@ typedef struct {
 
 void fill_triangle(SDL_Renderer *renderer, Triangle triangle);
 
+Triangle triangle_sorted_by_y(Triangle t);
+
 #endif // TRIANGLE_H_
