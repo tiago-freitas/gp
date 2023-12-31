@@ -20,6 +20,8 @@
 #define AGENT_PADDING 15.0f
 
 #define FOODS_COUNT 4
+#define FOOD_PADDING (AGENT_PADDING)
+
 #define WALLS_COUNT 4
 
 int scc(int code)
@@ -52,6 +54,16 @@ void sdl_set_color_hex(SDL_Renderer *renderer, Uint32 hex)
     scc(SDL_SetRenderDrawColor(
             renderer,
             r, g, b, a));
+}
+
+int swap_hex(Uint32 hex)
+{
+    int r = (hex & 0xFF) << 24;
+    int g = ((hex >> 8) & 0xFF)  << 16;
+    int b = ((hex >> 16) & 0xFF) << 8;
+    int a = ((hex >> 24));
+
+    return r + g + b + a;
 }
 
 typedef enum {
@@ -180,8 +192,10 @@ void render_agent(SDL_Renderer *renderer, Agent agent)
     Sint16 x3 = agents_dirs[agent.dir][4] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent.pos_x * CELL_WIDTH + AGENT_PADDING;
     Sint16 y3 = agents_dirs[agent.dir][5] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent.pos_y * CELL_HEIGHT + AGENT_PADDING;
 
-    filledTrigonColor(renderer, x1, y1, x2, y2, x3, y3, AGENT_COLOR);
-    aatrigonColor(renderer, x1, y1, x2, y2, x3, y3, AGENT_COLOR);
+    Uint32 c = swap_hex(AGENT_COLOR);
+
+    filledTrigonColor(renderer, x1, y1, x2, y2, x3, y3, c);
+    aatrigonColor(renderer, x1, y1, x2, y2, x3, y3, c);
 }
 
 void render_wall(SDL_Renderer *renderer, Wall wall)
@@ -200,12 +214,14 @@ void render_wall(SDL_Renderer *renderer, Wall wall)
 
 void render_food(SDL_Renderer *renderer, Food food)
 {
-    int x = food.pos_x * CELL_WIDTH  + (CELL_WIDTH  * 0.5);
-    int y = food.pos_y * CELL_HEIGHT + (CELL_HEIGHT * 0.5);
-    int rad = 20;
+    Sint16 x = floorf(food.pos_x * CELL_WIDTH  + (CELL_WIDTH  * 0.5f));
+    Sint16 y = floorf(food.pos_y * CELL_HEIGHT + (CELL_HEIGHT * 0.5f));
+    Sint16 rad = floorf(fminf(CELL_WIDTH, CELL_HEIGHT) * 0.5f - FOOD_PADDING);
 
-    aacircleColor(renderer, x, y, rad, FOOD_COLOR);
-    filledCircleColor(renderer, x, y, rad, FOOD_COLOR);
+    Uint32 c = swap_hex(FOOD_COLOR);
+    
+    aacircleColor(renderer, x, y, rad, c);
+    filledCircleColor(renderer, x, y, rad, c);
 }
 
 void render_game(SDL_Renderer *renderer, const Game *game)
