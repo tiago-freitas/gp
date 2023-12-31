@@ -109,6 +109,7 @@ typedef enum {
     ENV_AGENT,
     ENV_FOOD,
     ENV_WALL,
+    ENV_COUNT,
 } Env;
 
 typedef enum {
@@ -118,6 +119,7 @@ typedef enum {
     ACTION_ATTACK,
     ACTION_TURN_LEFT,
     ACTION_TURN_RIGHT,
+    ACTION_COUNT,
 } Action;
 
 typedef struct {
@@ -279,7 +281,8 @@ void render_food(SDL_Renderer *renderer, Food food)
 void render_game(SDL_Renderer *renderer, const Game *game)
 {
     for (size_t i = 0; i < AGENTS_COUNT; ++i) {
-        render_agent(renderer, game->agents[i]);
+        if (game->agents[i].health > 0)
+            render_agent(renderer, game->agents[i]);
     }        
 
     for (size_t i = 0; i < WALLS_COUNT; ++i) {
@@ -287,8 +290,19 @@ void render_game(SDL_Renderer *renderer, const Game *game)
     }        
 
     for (size_t i = 0; i < FOODS_COUNT; ++i) {
-        render_food(renderer, game->foods[i]);
+        if (!game->foods[i].eaten)
+            render_food(renderer, game->foods[i]);
     }        
+}
+
+Env random_env(void)
+{
+    return random_int_range(0, ENV_COUNT);
+}
+
+Action random_action(void)
+{
+    return random_int_range(0, ACTION_COUNT);
 }
 
 void init_game(Game *game)
@@ -299,6 +313,13 @@ void init_game(Game *game)
     for (size_t i = 0; i < AGENTS_COUNT; ++i) {
         game->agents[i].pos = pos;
         game->agents[i] = random_agent(game);
+
+        for (size_t j = 0; j < GENES_COUNT; ++j) {
+            game->chromos[i].genes[j].state = random_int_range(0, GENES_COUNT);
+            game->chromos[i].genes[j].env = random_env();
+            game->chromos[i].genes[j].action = random_action();
+            game->chromos[i].genes[j].next_state = random_int_range(0, GENES_COUNT);
+        }
     }
 
     for (size_t i = 0; i < FOODS_COUNT; ++i) {
@@ -325,7 +346,7 @@ Food *food_infront_of_agent(Game *game, size_t agent_index)
 {
     Coord infront = coord_infront_of_agent(&game->agents[agent_index]);
     for (size_t i = 0; i < FOODS_COUNT; i++) {
-        if (coord_equals(infront, game->foods[i].pos)) {
+        if (!game->foods[i].eaten && coord_equals(infront, game->foods[i].pos)) {
             return &game->foods[i];
         }
     }
@@ -336,7 +357,7 @@ Agent *agent_infront_of_agent(Game *game, size_t agent_index)
 {
     Coord infront = coord_infront_of_agent(&game->agents[agent_index]);
     for (size_t i = 0; i < AGENTS_COUNT; i++) {
-        if (i != agent_index && coord_equals(infront, game->agents[i].pos)) {
+        if (i != agent_index &&game->agents[i].health > 0 && coord_equals(infront, game->agents[i].pos)) {
             return &game->agents[i];
         }
     }
@@ -381,7 +402,6 @@ void step_agent(Agent *agent)
 }
 
 
-
 void execute_action(Game *game, size_t agent_index, Action action)
 {
     switch (action) {
@@ -415,12 +435,16 @@ void execute_action(Game *game, size_t agent_index, Action action)
         }
     } break;
 
-    case ACTION_TURN_LEFT:{
+    case ACTION_TURN_LEFT: {
         game->agents[agent_index].dir = (game->agents[agent_index].dir + 1) % 4;
     } break;
 
-    case ACTION_TURN_RIGHT:{
+    case ACTION_TURN_RIGHT: {
         game->agents[agent_index].dir = (game->agents[agent_index].dir + 1) % 4;
+    } break;
+
+    case ACTION_COUNT: {
+        assert(0 && "Unreachable");
     } break;
     }
 }
