@@ -3,5 +3,5 @@ CFLAGS=-Wall -Wextra -Wold-style-definition -ggdb -std=c11 -pedantic `pkg-config
 LIBS=-lm `pkg-config --libs $(PKGS)`
 
 gp: main.c style.h
-	$(CC) $(CFLAGS) -o gp main.c $(LIBS)
+	$(CC) $(CFLAGS) -o gp main.c $(LIBS) -D_XOPEN_SOURCE
 
