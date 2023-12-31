@@ -1,5 +1,5 @@
 PKGS=sdl2 SDL2_gfx
-CFLAGS=-Wall -Wextra -ggdb -std=c11 -pedantic `pkg-config --cflags $(PKGS)`
+CFLAGS=-Wall -Wextra -Wold-style-definition -ggdb -std=c11 -pedantic `pkg-config --cflags $(PKGS)`
 LIBS=-lm `pkg-config --libs $(PKGS)`
 
 gp: main.c style.h
