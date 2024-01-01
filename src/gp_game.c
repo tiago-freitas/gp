@@ -33,9 +33,9 @@ const char *dir_as_cstr(Dir dir)
 {
     switch (dir) {
     case DIR_RIGHT: return "DIR_RIGHT";
-    case DIR_UP: return "DIR_UP";
-    case DIR_LEFT: return "DIR_LEFT";
-    case DIR_DOWN: return "DIR_DOWN";
+    case DIR_UP:    return "DIR_UP";
+    case DIR_LEFT:  return "DIR_LEFT";
+    case DIR_DOWN:  return "DIR_DOWN";
     case DIR_COUNT: return "DIR_COUNT";
     } 
     return "Error: dir_as_cstr";
@@ -83,10 +83,11 @@ void init_game(Game *game)
         game->walls[i].pos = pos;
             
     for (size_t i = 0; i < AGENTS_COUNT; ++i) {
-        game->agents[i].pos    = random_empty_coord_on_board(game);
-        game->agents[i].dir    = random_dir();
-        game->agents[i].hunger = HUNGER_MAX;
-        game->agents[i].health = HEALTH_MAX;
+        game->agents[i].pos      = random_empty_coord_on_board(game);
+        game->agents[i].dir      = random_dir();
+        game->agents[i].hunger   = HUNGER_MAX;
+        game->agents[i].health   = HEALTH_MAX;
+        game->agents[i].lifetime = 0;
 
         for (size_t j = 0; j < GENES_COUNT; ++j) {
             game->chromos[i].genes[j].state = random_int_range(0, STATE_COUNT);
@@ -123,6 +124,7 @@ void print_agent(FILE *stream, const Agent *agent)
     fprintf(stream, " .hunger = %d\n", agent->hunger);
     fprintf(stream, " .health = %d\n", agent->health);
     fprintf(stream, " .state = %d\n", agent->state);
+    fprintf(stream, " .lifetime = %d\n", agent->lifetime);
     fprintf(stream, "}\n");
 }
 
@@ -243,24 +245,29 @@ void execute_action(Game *game, size_t agent_index, Action action)
 
 void step_game(Game *game)
 {
-    // Interpret genes
     for (size_t i = 0; i < AGENTS_COUNT; ++i) {
-        for (size_t j = 0; j < GENES_COUNT; ++j) {
-            Gene gene = game->chromos[i].genes[j];
-            if (gene.state == game->agents[i].state &&
-                gene.env == env_of_agent(game, i)) {
-                execute_action(game, i, gene.action);
-                game->agents[i].state = gene.next_state;
-                break;
+        if (game->agents[i].health > 0) {
+            // Interpret genes
+            for (size_t j = 0; j < GENES_COUNT; ++j) {
+                Gene gene = game->chromos[i].genes[j];
+                if (gene.state == game->agents[i].state && gene.env == env_of_agent(game, i)) {
+                    execute_action(game, i, gene.action);
+                    game->agents[i].state = gene.next_state;
+                    break;
+                }
             }
-        }
-    }
 
-    // Handle hunger
-    for (size_t i = 0; i < AGENTS_COUNT; ++i) {
-        game->agents[i].hunger -= STEP_HUNGER_DAMAGE;
-        if (game->agents[i].hunger <= 0) {
-            game->agents[i].health = 0;
+            // Handle hunger
+            game->agents[i].hunger -= STEP_HUNGER_DAMAGE;
+            if (game->agents[i].hunger <= 0)
+                game->agents[i].health = 0;
+            else
+                game->agents[i].lifetime++;
         }
     }
+}
+
+void dump_best(Game *game)
+{
+    (void) game;
 }

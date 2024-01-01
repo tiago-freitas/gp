@@ -43,17 +43,18 @@ void render_grid_board(SDL_Renderer *renderer)
     }
 }
 
-void render_agent(SDL_Renderer *renderer, Agent agent)
+void render_agent(SDL_Renderer *renderer, const Agent *agent)
 {
     // scale and shift
-    Sint16 x1 = agents_dirs[agent.dir][0] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent.pos.x * CELL_WIDTH + AGENT_PADDING;
-    Sint16 y1 = agents_dirs[agent.dir][1] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent.pos.y * CELL_HEIGHT + AGENT_PADDING;
-    Sint16 x2 = agents_dirs[agent.dir][2] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent.pos.x * CELL_WIDTH + AGENT_PADDING;
-    Sint16 y2 = agents_dirs[agent.dir][3] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent.pos.y * CELL_HEIGHT + AGENT_PADDING;
-    Sint16 x3 = agents_dirs[agent.dir][4] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent.pos.x * CELL_WIDTH + AGENT_PADDING;
-    Sint16 y3 = agents_dirs[agent.dir][5] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent.pos.y * CELL_HEIGHT + AGENT_PADDING;
+    Sint16 x1 = agents_dirs[agent->dir][0] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent->pos.x * CELL_WIDTH + AGENT_PADDING;
+    Sint16 y1 = agents_dirs[agent->dir][1] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent->pos.y * CELL_HEIGHT + AGENT_PADDING;
+    Sint16 x2 = agents_dirs[agent->dir][2] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent->pos.x * CELL_WIDTH + AGENT_PADDING;
+    Sint16 y2 = agents_dirs[agent->dir][3] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent->pos.y * CELL_HEIGHT + AGENT_PADDING;
+    Sint16 x3 = agents_dirs[agent->dir][4] * (CELL_WIDTH  - AGENT_PADDING * 2) + agent->pos.x * CELL_WIDTH + AGENT_PADDING;
+    Sint16 y3 = agents_dirs[agent->dir][5] * (CELL_HEIGHT - AGENT_PADDING * 2) + agent->pos.y * CELL_HEIGHT + AGENT_PADDING;
 
-    Uint32 c = REV(AGENT_COLOR);
+    Uint32 c = agent->health <= 0 ? AGENT_DEAD_COLOR : AGENT_ALIVE_COLOR;
+    c = REV(c);
 
     filledTrigonColor(renderer, x1, y1, x2, y2, x3, y3, c);
     aatrigonColor(renderer, x1, y1, x2, y2, x3, y3, c);
@@ -88,8 +89,7 @@ void render_food(SDL_Renderer *renderer, Food food)
 void render_game(SDL_Renderer *renderer, const Game *game)
 {
     for (size_t i = 0; i < AGENTS_COUNT; ++i) {
-        if (game->agents[i].health > 0)
-            render_agent(renderer, game->agents[i]);
+        render_agent(renderer, &game->agents[i]);
     }        
 
     for (size_t i = 0; i < WALLS_COUNT; ++i) {

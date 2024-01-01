@@ -1,19 +1,19 @@
 #ifndef GP_GAME_H_
 #define GP_GAME_H_
 
-#define BOARD_WIDTH  10
-#define BOARD_HEIGHT 10
+#define BOARD_WIDTH  100
+#define BOARD_HEIGHT 100
 
 #define ATTACK_DAMAGE        10
-#define HEALTH_MAX          100
+#define HEALTH_MAX           100
 #define FOOD_HUNGER_RECOVERY 10
 #define HUNGER_MAX           100
 #define STEP_HUNGER_DAMAGE   5
 
-#define AGENTS_COUNT 10
-#define FOODS_COUNT  5
-#define WALLS_COUNT  10
-#define GENES_COUNT  50
+#define AGENTS_COUNT 2000
+#define FOODS_COUNT  1000
+#define WALLS_COUNT  100
+#define GENES_COUNT  10
 #define STATE_COUNT  6
 
 static_assert(AGENTS_COUNT + FOODS_COUNT + WALLS_COUNT <= BOARD_WIDTH * BOARD_HEIGHT,
@@ -80,6 +80,7 @@ typedef struct {
     int hunger;
     int health;
     State state;
+    int lifetime;
 } Agent;
 
 const char *dir_as_cstr(Dir dir);
@@ -120,5 +121,6 @@ Env env_of_agent(Game *game, size_t agent_index);
 void step_agent(Agent *agent);
 void execute_action(Game *game, size_t agent_index, Action action);
 void step_game(Game *game);
+void dump_best(Game *game);
 
 #endif // GP_GAME_H_

@@ -11,11 +11,12 @@
 #define FOOD_PADDING (AGENT_PADDING)
 
 // Style
-#define BACKGROUND_COLOR 0x353535FF
-#define GRID_COLOR       0x748CABFF
-#define WALL_COLOR       (GRID_COLOR)
-#define AGENT_COLOR      0xDA2C38FF
-#define FOOD_COLOR       0x87C38FFF
+#define BACKGROUND_COLOR  0x353535FF
+#define GRID_COLOR        0x748CABFF
+#define WALL_COLOR        (GRID_COLOR)
+#define AGENT_ALIVE_COLOR 0xDA2C38FF
+#define AGENT_DEAD_COLOR  0x909090FF
+#define FOOD_COLOR        0x87C38FFF
 
 #define HEX_COLOR(hex)                       \
     ((hex) >> (3 * 8)) & 0xFF,               \
@@ -42,7 +43,7 @@ void *scp(void *ptr);
 
 void render_grid_board(SDL_Renderer *renderer);
 
-void render_agent(SDL_Renderer *renderer, Agent agent);
+void render_agent(SDL_Renderer *renderer, const Agent *agent);
 
 void render_wall(SDL_Renderer *renderer, Wall wall);
 

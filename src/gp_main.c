@@ -21,7 +21,9 @@ int main(void)
     SDL_Renderer *const renderer = scp(SDL_CreateRenderer(
         window,
         -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
+        SDL_RENDERER_ACCELERATED));
+
+    // SDL_RENDERER_PRESENTVSYNC
 
     scc(SDL_RenderSetLogicalSize(
             renderer,
@@ -49,6 +51,9 @@ int main(void)
                 case SDLK_r: {
                     init_game(&game);
                 } break;
+                case SDLK_n: {
+                    dump_best(&game);
+                } break;
                 } 
             } break;
 
@@ -72,11 +77,14 @@ int main(void)
         scc(SDL_SetRenderDrawColor(renderer, HEX_COLOR(BACKGROUND_COLOR)));
         scc(SDL_RenderClear(renderer));
 
-        render_grid_board(renderer);
+        // render_grid_board(renderer);
         render_game(renderer, &game);
 
         SDL_RenderPresent(renderer);
-        // quit = 1;
+
+        // Cap framerate!
+        // SDL_Delay(floor(16.666f));
+        SDL_Delay(30.0f);
     }
 
     SDL_Quit();
