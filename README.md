@@ -15,8 +15,8 @@ $ ./gp
 
 | Key              |  Action                        |
 |------------------|--------------------------------|
-| <kbd>r</kdb>     | Generate new state of the game |
-| <kdb>SPACE</kdb> | Step the state of the game     |
+| <kbd>r</kbd>     | Generate new state of the game |
+| <kbd>SPACE</kbd> | Step the state of the game     |
  
 
 
