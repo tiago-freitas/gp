@@ -1,10 +1,6 @@
-#include "./gp_game.h"
-#include "./gp_random.c"
-
 int coord_equals(Coord a, Coord b)
 {
-    return a.x ==
- b.x && a.y == b.y;
+    return a.x == b.x && a.y == b.y;
 }
 
 const char *env_as_cstr(Env env)
@@ -31,6 +27,18 @@ const char *action_as_cstr(Action action)
     case ACTION_COUNT:      return "ACTION_COUNT";
     }
     return "Error: action_as_cstr";
+}
+
+const char *dir_as_cstr(Dir dir)
+{
+    switch (dir) {
+    case DIR_RIGHT: return "DIR_RIGHT";
+    case DIR_UP: return "DIR_UP";
+    case DIR_LEFT: return "DIR_LEFT";
+    case DIR_DOWN: return "DIR_DOWN";
+    case DIR_COUNT: return "DIR_COUNT";
+    } 
+    return "Error: dir_as_cstr";
 }
 
 void print_chromo(FILE *stream, const Chromo *chromo)
@@ -95,6 +103,27 @@ void init_game(Game *game)
     for (size_t i = 0; i < WALLS_COUNT ; ++i) {
         game->walls[i].pos = random_empty_coord_on_board(game);
     }
+}
+
+Agent *agent_at(Game *game, Coord pos)
+{
+    for (size_t i = 0; i < AGENTS_COUNT; ++i)
+    {
+        if (coord_equals(game->agents[i].pos, pos))
+            return &game->agents[i];
+    }
+    return NULL;
+}
+
+void print_agent(FILE *stream, const Agent *agent)
+{
+    fprintf(stream, "Agent {\n");
+    fprintf(stream, " .pos = {%d %d}\n", agent->pos.x, agent->pos.y);
+    fprintf(stream, " .dir = %-9s\n", dir_as_cstr(agent->dir));
+    fprintf(stream, " .hunger = %d\n", agent->hunger);
+    fprintf(stream, " .health = %d\n", agent->health);
+    fprintf(stream, " .state = %d\n", agent->state);
+    fprintf(stream, "}\n");
 }
 
 Coord coord_infront_of_agent(const Agent *agent)
@@ -222,6 +251,7 @@ void step_game(Game *game)
                 gene.env == env_of_agent(game, i)) {
                 execute_action(game, i, gene.action);
                 game->agents[i].state = gene.next_state;
+                break;
             }
         }
     }

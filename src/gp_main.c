@@ -1,6 +1,3 @@
-#include "./gp_game.c"
-#include "./gp_visual.c"
-
 Game game = {0};
 
 int main(void)
@@ -9,7 +6,7 @@ int main(void)
 
     init_game(&game);
 
-    print_chromo(stdout, &game.chromos[0]);
+    // print_chromo(stdout, &game.chromos[0]);
 
     putenv((char *)"SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR=0");
     
@@ -26,22 +23,24 @@ int main(void)
         -1,
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
 
-    // scc(SDL_RenderSetLogicalSize(
-    //         renderer,
-    //         SCREEN_WIDTH,
-    //         SCREEN_HEIGHT));
+    scc(SDL_RenderSetLogicalSize(
+            renderer,
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT));
 
-    // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
 
 
     int quit = 0;
+    SDL_Event event;
     while (!quit) {
-        SDL_Event event;
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
+
             case SDL_QUIT: {
-                 quit = 1;
+                quit = 1;
             } break;
+
             case SDL_KEYDOWN: {
                 switch (event.key.keysym.sym) {
                 case SDLK_SPACE: {
@@ -50,8 +49,23 @@ int main(void)
                 case SDLK_r: {
                     init_game(&game);
                 } break;
+                } 
+            } break;
+
+            case SDL_MOUSEBUTTONDOWN: {
+                switch (event.button.button) {
+                case SDL_BUTTON_LEFT: {
+                    Coord pos;
+                    pos.x = (int) floorf(event.button.x / CELL_WIDTH);
+                    pos.y = (int) floorf(event.button.y / CELL_HEIGHT);
+                    Agent *agent = agent_at(&game, pos);
+                    if (agent) {
+                        print_agent(stdout, agent);
+                    }
+                } break;
                 }
             } break;
+
             }
         }
 
