@@ -1,8 +1,8 @@
 #ifndef GP_GAME_H_
 #define GP_GAME_H_
 
-#define BOARD_WIDTH  100
-#define BOARD_HEIGHT 100
+#define BOARD_WIDTH  200
+#define BOARD_HEIGHT 200
 
 #define ATTACK_DAMAGE        10
 #define HEALTH_MAX           100
@@ -12,9 +12,9 @@
 
 #define AGENTS_COUNT 2000
 #define FOODS_COUNT  1000
-#define WALLS_COUNT  100
+#define WALLS_COUNT  200
 #define GENES_COUNT  10
-#define STATE_COUNT  6
+#define STATE_COUNT  5
 
 static_assert(AGENTS_COUNT + FOODS_COUNT + WALLS_COUNT <= BOARD_WIDTH * BOARD_HEIGHT,
               "Too many entities");

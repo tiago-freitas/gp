@@ -18,7 +18,7 @@ $ ./gp
 | Key              |  Action                        |
 |------------------|--------------------------------|
 | <kbd>r</kbd>     | Generate new state of the game |
-| <kbd>SPACE</kbd> | Step the state of the game     |
+| <kbd>n</kbd>     | Create a next gen              |
 | <kbd>SPACE</kbd> | Step the state of the game     |
 
 ## Mouse

@@ -203,30 +203,23 @@ void execute_action(Game *game, size_t agent_index, Action action)
     } break;
     
     case ACTION_STEP:{
-        Food *food = food_infront_of_agent(game, agent_index);
-        if (food) {
+        Food *food = NULL;
+        Agent *other_agent = NULL;
+
+        if (food = food_infront_of_agent(game, agent_index), food) {
             food->eaten = 1;
             game->agents[agent_index].hunger += FOOD_HUNGER_RECOVERY;
             if (game->agents[agent_index].hunger > HUNGER_MAX) {
                 game->agents[agent_index].hunger = HUNGER_MAX;
             }
-
-            break;
-        }
-
-        Agent *other_agent = agent_infront_of_agent(game, agent_index);
-        if (other_agent) {
+            step_agent(&game->agents[agent_index]);
+        } else if (agent_infront_of_agent(game, agent_index), other_agent) {
             // TODO: make agent drop the food when they die
             other_agent->health -= ATTACK_DAMAGE;
-
-            break;
-        }
-
-        Wall *wall = wall_infront_of_agent(game, agent_index);
-        if (wall == NULL) {
+        } else if (wall_infront_of_agent(game, agent_index) == NULL) {
             step_agent(&game->agents[agent_index]);
         }
-    }   break;
+    } break;
 
     case ACTION_TURN_LEFT: {
         game->agents[agent_index].dir = (game->agents[agent_index].dir + 1) % 4;
