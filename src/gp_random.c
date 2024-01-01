@@ -1,5 +1,4 @@
 #include "./gp_game.h"
-#include "./gp_random.h"
 
 int random_int_range(int low, int high)
 {
