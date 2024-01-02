@@ -13,10 +13,10 @@
 #define AGENTS_COUNT 2000
 #define FOODS_COUNT  1000
 #define WALLS_COUNT  200
-#define GENES_COUNT  10
-#define STATE_COUNT  5
+#define GENES_COUNT  20
+#define STATE_COUNT  7
 
-#define MUTATION_PROB    1
+#define MUTATION_PROB    5
 #define SELECTION_POOL   5
 
 static_assert(AGENTS_COUNT + FOODS_COUNT + WALLS_COUNT <= BOARD_WIDTH * BOARD_HEIGHT,
@@ -115,6 +115,11 @@ void print_chromo(FILE *stream, const Chromo *chromo);
 int is_cell_occupy(const Game *game, Coord pos);
 
 void init_game(Game *game);
+
+void dump_game(const char *filepath, const Game *game);
+void load_game(const char *filepath, Game *game);
+
+int is_everyone_dead(const Game *game);
 
 Agent *agent_at(Game *game, Coord pos);
 Coord coord_infront_of_agent(const Agent *agent);

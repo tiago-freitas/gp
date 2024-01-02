@@ -70,7 +70,8 @@ int is_cell_occupy(const Game *game, Coord pos)
 
 void init_game(Game *game)
 {
-    *game = (Game) {0};
+
+    memset(game, 0, sizeof(Game));
 
     Coord pos = {BOARD_WIDTH, BOARD_HEIGHT};
     for (size_t i = 0; i < AGENTS_COUNT; ++i)
@@ -102,6 +103,40 @@ void init_game(Game *game)
     for (size_t i = 0; i < WALLS_COUNT ; ++i) {
         game->walls[i].pos = random_empty_coord_on_board(game);
     }
+}
+
+void dump_game(const char *filepath, const Game *game)
+{
+    FILE *stream = fopen(filepath, "wb");
+    if (stream == NULL) {
+        fprintf(stderr, "Could not open file: `%s`\n", filepath);
+    }
+    fwrite(game, sizeof(*game), 1, stream);
+    if (ferror(stream)) {
+        fprintf(stderr, "Could not dump to file `%s`\n", filepath);
+        fclose(stream);
+    }
+    fclose(stream);
+
+    printf("Dumped current state to `%s`\n", filepath);
+}
+
+void load_game(const char *filepath, Game *game)
+{
+    FILE *stream = fopen(filepath, "rb");
+    if (stream == NULL) {
+        fprintf(stderr, "Could not open file `%s`\n", filepath);
+    }
+
+    size_t n = fread(game, sizeof(*game), 1, stream);
+    if (ferror(stream)) {
+        fprintf(stderr, "Could not load from file `%s`\n", filepath);
+        fclose(stream);
+    }
+
+    assert(n == 1);
+    printf("Load current state of file `%s`\n", filepath);
+    fclose(stream);
 }
 
 Agent *agent_at(Game *game, Coord pos)
@@ -310,15 +345,22 @@ void mutate_agent(Agent *agent)
 
 void make_new_generation(Game *prev_game, Game *next_game)
 {
-    print_best_agents(stdout, prev_game, SELECTION_POOL);
+    // print_best_agents(stdout, prev_game, SELECTION_POOL);
+
+    qsort(&prev_game->agents, AGENTS_COUNT, sizeof(Agent),
+          compare_agents_lifetimes);
+
+    for (size_t i = 0; i < FOODS_COUNT; ++i) {
+        next_game->foods[i].pos = prev_game->foods[i].pos;
+    }
+
+    for (size_t i = 0; i < WALLS_COUNT ; ++i) {
+        next_game->walls[i].pos = prev_game->walls[i].pos;
+    }
 
     Coord pos = {BOARD_WIDTH, BOARD_HEIGHT};
     for (size_t i = 0; i < AGENTS_COUNT; ++i)
         next_game->agents[i].pos = pos;
-    for (size_t i = 0; i < FOODS_COUNT; ++i)
-        next_game->foods[i].pos = pos;
-    for (size_t i = 0; i < WALLS_COUNT ; ++i)
-        next_game->walls[i].pos = pos;
 
     for (size_t i = 0; i < AGENTS_COUNT; ++i)
     {
@@ -337,13 +379,12 @@ void make_new_generation(Game *prev_game, Game *next_game)
         next_game->agents[i].health   = HEALTH_MAX;
         next_game->agents[i].lifetime = 0;
     }
+}
 
-    for (size_t i = 0; i < FOODS_COUNT; ++i) {
-        next_game->foods[i].pos = random_empty_coord_on_board(next_game);
-    }
-
-    for (size_t i = 0; i < WALLS_COUNT ; ++i) {
-        next_game->walls[i].pos = random_empty_coord_on_board(next_game);
-    }
-
+int is_everyone_dead(const Game *game)
+{
+    for (int i = 0; i < AGENTS_COUNT; ++i)
+        if (game->agents[i].health > 0)
+            return 0;
+    return 1;
 }

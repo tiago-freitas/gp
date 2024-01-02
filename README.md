@@ -15,11 +15,11 @@ $ ./gp
 
 ## Keyboard
 
-| Key              |  Action                        |
-|------------------|--------------------------------|
-| <kbd>r</kbd>     | Generate new state of the game |
-| <kbd>n</kbd>     | Create a next gen              |
-| <kbd>SPACE</kbd> | Step the state of the game     |
+| Key                | Action                                          |
+| ------------------ | ------------------------------------------------|
+| <kbd>r</kbd>       | Generate new state of the game                  |
+| <kbd>n</kbd>       | Make a next generation based on the best agents |
+| <kbd>SPACE</kbd>   | Step the state of the game                      |
 
 ## Mouse
 
