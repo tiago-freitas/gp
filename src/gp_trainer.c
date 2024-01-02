@@ -9,7 +9,7 @@
 
 #define DUMP_FILEPATH "./game.bin"
 #define TRAINED_FILEPATH "./trained.bin"
-#define MAX_GENERATIONS 10
+#define MAX_GENERATIONS 1000
 
 Game games[2] = {0};
 
@@ -19,21 +19,23 @@ const char *shift(int *argc, char ***argv)
     const char *result = **argv;
     *argc -= 1;
     *argv += 1;
-    return result
+    return result;
 }
 
 int main(int argc, char const *argv[])
 {
-    if (argc < 3) {
-        fprintf("Usage: ./gp_trainer <generations-count> <output.bin>\n");
-        fprintf(stderr, "ERROR: output filepath is not provided\n");
-    }
+    (void) argv;
+    (void) argc;
+    // if (argc < 3) {
+    //     fprintf(stderr, "Usage: ./gp_trainer <generations-count> <output.bin>\n");
+    //     fprintf(stderr, "ERROR: output filepath is not provided\n");
+    // }
 
     srand(time(0));
 
     int current = 0;
     init_game(&games[current]);
-    load_game(DUMP_FILEPATH, &games[current]);
+    // load_game(DUMP_FILEPATH, &games[current]);
 
     for (int i = 0; i < MAX_GENERATIONS; ++i)
     {
@@ -51,7 +53,7 @@ int main(int argc, char const *argv[])
         current = next;
     }
 
-    dump_game(TRAINED_FILEPATH, &games[current]);
+    // dump_game(TRAINED_FILEPATH, &games[current]);
 
     return 0;
 }

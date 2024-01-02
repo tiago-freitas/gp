@@ -4,7 +4,7 @@ CFLAGS_SDL=`pkg-config --cflags $(PKGS)`
 LIBS=-lm
 LIBS_SDL=`pkg-config --libs $(PKGS)`
 
-COMMON_SRC=src/gp_game.h src/gp_game.c
+COMMON_SRC=src/gp_game.h src/gp_game.c src/gp_random.c src/gp_random.h
 
 all: gp_trainer gp_simulator
 

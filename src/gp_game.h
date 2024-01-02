@@ -1,8 +1,8 @@
 #ifndef GP_GAME_H_
 #define GP_GAME_H_
 
-#define BOARD_WIDTH  100
-#define BOARD_HEIGHT 100
+#define BOARD_WIDTH  10
+#define BOARD_HEIGHT 10
 
 #define ATTACK_DAMAGE        10
 #define HEALTH_MAX           100
@@ -10,14 +10,16 @@
 #define HUNGER_MAX           100
 #define STEP_HUNGER_DAMAGE   5
 
-#define AGENTS_COUNT 2000
-#define FOODS_COUNT  1000
-#define WALLS_COUNT  200
+#define AGENTS_COUNT 4
+#define FOODS_COUNT  3
+#define WALLS_COUNT  3
 #define GENES_COUNT  20
 #define STATE_COUNT  7
 
 #define MUTATION_PROB    5
 #define SELECTION_POOL   5
+
+#define COORDS(pos) pos.x * (BOARD_WIDTH) + pos.y
 
 static_assert(AGENTS_COUNT + FOODS_COUNT + WALLS_COUNT <= BOARD_WIDTH * BOARD_HEIGHT,
               "Too many entities. Can't fit all of them pn the board.");
@@ -102,15 +104,8 @@ typedef struct {
     Coord pos;
 } Wall;
 
-typedef enum {
-    NONE = 0,
-    AGENT,
-    FOOD,
-    WALL
-} Type;
-
 typedef struct {
-    Type type;
+    Env type;
     size_t index;
 } Ent;
 
@@ -135,11 +130,8 @@ int is_everyone_dead(const Game *game);
 
 Agent *agent_at(Game *game, Coord pos);
 Coord coord_infront_of_agent(const Agent *agent);
-Food *food_infront_of_agent(Game *game, size_t agent_index);
-Agent *agent_infront_of_agent(Game *game, size_t agent_index);
-Wall *wall_infront_of_agent(Game *game, size_t agent_index);
 
-Env env_of_agent(Game *game, size_t agent_index);
+Ent env_of_agent(Game *game, size_t agent_index);
 
 void step_agent(Agent *agent);
 void execute_action(Game *game, size_t agent_index, Action action);

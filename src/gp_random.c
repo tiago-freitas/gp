@@ -2,8 +2,9 @@
 
 int is_cell_occupy(const Game *game, Coord pos)
 {
-    if (game->gameboard[pos.x * BOARD_WIDTH + pos.y].type == NONE)
-        return 0
+    printf("%s\n", env_as_cstr(game->gameboard[pos.x * BOARD_WIDTH + pos.y].type));
+    if (game->gameboard[pos.x * BOARD_WIDTH + pos.y].type == ENV_NOTHING)
+        return 0;
     return 1;
 }
 
