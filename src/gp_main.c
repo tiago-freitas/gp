@@ -52,8 +52,9 @@ int main(void)
                     init_game(&game);
                 } break;
                 case SDLK_n: {
-                    print_best_agents(stdout, &game, 5);
-
+                    Game next_game = {0};
+                    make_new_generation(&game, &next_game);
+                    game = next_game;
                 } break;
                 } 
             } break;

@@ -282,3 +282,68 @@ void print_best_agents(FILE *stream, Game *game, size_t n)
     }
 
 }
+
+void mate_agents(const Agent *parent1, const Agent *parent2, Agent *child)
+{
+    const size_t length = (GENES_COUNT / 2) * sizeof(Gene);
+
+    memcpy(child->chromo.genes,
+           parent1->chromo.genes,
+           length);
+
+    memcpy(child->chromo.genes + length,
+           parent2->chromo.genes + length,
+           length);
+}
+
+void mutate_agent(Agent *agent)
+{
+    for (size_t i = 0; i < GENES_COUNT; ++i) {
+        if (random_int_range(0, 100) <= (MUTATION_PROB-1)) {
+            agent->chromo.genes[i].state = random_int_range(0, STATE_COUNT);
+            agent->chromo.genes[i].env = random_env();
+            agent->chromo.genes[i].action = random_action();
+            agent->chromo.genes[i].next_state = random_int_range(0, STATE_COUNT);
+        }
+    }
+}
+
+void make_new_generation(Game *prev_game, Game *next_game)
+{
+    print_best_agents(stdout, prev_game, SELECTION_POOL);
+
+    Coord pos = {BOARD_WIDTH, BOARD_HEIGHT};
+    for (size_t i = 0; i < AGENTS_COUNT; ++i)
+        next_game->agents[i].pos = pos;
+    for (size_t i = 0; i < FOODS_COUNT; ++i)
+        next_game->foods[i].pos = pos;
+    for (size_t i = 0; i < WALLS_COUNT ; ++i)
+        next_game->walls[i].pos = pos;
+
+    for (size_t i = 0; i < AGENTS_COUNT; ++i)
+    {
+        size_t p1 = random_int_range(0, SELECTION_POOL);
+        size_t p2 = random_int_range(0, SELECTION_POOL);
+
+        mate_agents(&prev_game->agents[p1],
+                    &prev_game->agents[p2],
+                    &next_game->agents[i]);
+
+        mutate_agent(&next_game->agents[i]);
+
+        next_game->agents[i].pos      = random_empty_coord_on_board(next_game);
+        next_game->agents[i].dir      = random_dir();
+        next_game->agents[i].hunger   = HUNGER_MAX;
+        next_game->agents[i].health   = HEALTH_MAX;
+        next_game->agents[i].lifetime = 0;
+    }
+
+    for (size_t i = 0; i < FOODS_COUNT; ++i) {
+        next_game->foods[i].pos = random_empty_coord_on_board(next_game);
+    }
+
+    for (size_t i = 0; i < WALLS_COUNT ; ++i) {
+        next_game->walls[i].pos = random_empty_coord_on_board(next_game);
+    }
+
+}

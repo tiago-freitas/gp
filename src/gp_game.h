@@ -16,8 +16,16 @@
 #define GENES_COUNT  10
 #define STATE_COUNT  5
 
+#define MUTATION_PROB    1
+#define SELECTION_POOL   5
+
 static_assert(AGENTS_COUNT + FOODS_COUNT + WALLS_COUNT <= BOARD_WIDTH * BOARD_HEIGHT,
-              "Too many entities");
+              "Too many entities. Can't fit all of them pn the board.");
+
+static_assert(
+    GENES_COUNT % 2 == 0,
+    "Amount of genes in the chromosome must be an even number for the mating "
+    "process to happen properly.");
 
 typedef struct {
     int x, y;
@@ -122,5 +130,9 @@ void step_game(Game *game);
 
 int compare_agents_lifetimes(const void *a, const void *b);
 void print_best_agents(FILE *stream, Game *game, size_t n);
+
+void mate_agents(const Agent *parent1, const Agent *parent2, Agent *child);
+void mutate_agent(Agent *agent);
+void make_new_generation(Game *prev_game, Game *next_game);
 
 #endif // GP_GAME_H_
