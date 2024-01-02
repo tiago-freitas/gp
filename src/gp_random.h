@@ -1,6 +1,8 @@
 #ifndef GP_RANDOM_H_
 #define GP_RANDOM_H_
 
+int is_cell_occupy(const Game *game, Coord pos);
+
 int random_int_range(int low, int high);
 
 Coord random_coord_on_board(void);

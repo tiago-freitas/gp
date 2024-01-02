@@ -13,8 +13,22 @@
 
 Game games[2] = {0};
 
-int main(void)
+const char *shift(int *argc, char ***argv)
 {
+    assert(*argc > 0);
+    const char *result = **argv;
+    *argc -= 1;
+    *argv += 1;
+    return result
+}
+
+int main(int argc, char const *argv[])
+{
+    if (argc < 3) {
+        fprintf("Usage: ./gp_trainer <generations-count> <output.bin>\n");
+        fprintf(stderr, "ERROR: output filepath is not provided\n");
+    }
+
     srand(time(0));
 
     int current = 0;

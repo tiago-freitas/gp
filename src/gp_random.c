@@ -1,5 +1,12 @@
 #include "./gp_game.h"
 
+int is_cell_occupy(const Game *game, Coord pos)
+{
+    if (game->gameboard[pos.x * BOARD_WIDTH + pos.y].type == NONE)
+        return 0
+    return 1;
+}
+
 int random_int_range(int low, int high)
 {
     return rand() % (high - low) + low;

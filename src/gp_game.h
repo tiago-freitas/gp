@@ -102,17 +102,29 @@ typedef struct {
     Coord pos;
 } Wall;
 
+typedef enum {
+    NONE = 0,
+    AGENT,
+    FOOD,
+    WALL
+} Type;
+
+typedef struct {
+    Type type;
+    size_t index;
+} Ent;
+
 typedef struct {
     Agent agents[AGENTS_COUNT];
-    Food foods[FOODS_COUNT];
-    Wall walls[WALLS_COUNT];
+    Food  foods[FOODS_COUNT];
+    Wall  walls[WALLS_COUNT];
+    Ent   gameboard[BOARD_WIDTH * BOARD_HEIGHT];
 } Game;
 
 const char *env_as_cstr(Env env);
 const char *action_as_cstr(Action action);
 int coord_equals(Coord a, Coord b);
 void print_chromo(FILE *stream, const Chromo *chromo);
-int is_cell_occupy(const Game *game, Coord pos);
 
 void init_game(Game *game);
 

@@ -51,35 +51,10 @@ void print_chromo(FILE *stream, const Chromo *chromo)
     }
 }
 
-int is_cell_occupy(const Game *game, Coord pos)
-{
-    for (size_t i = 0; i < AGENTS_COUNT; ++i) 
-        if (coord_equals(game->agents[i].pos, pos))
-            return 1;
-
-    for (size_t i = 0; i < FOODS_COUNT; ++i)
-        if (coord_equals(game->foods[i].pos, pos))
-            return 1;
-
-    for (size_t i = 0; i < WALLS_COUNT; ++i)
-        if (coord_equals(game->walls[i].pos, pos))
-            return 1;
-
-    return 0;
-}
-
 void init_game(Game *game)
 {
 
     memset(game, 0, sizeof(Game));
-
-    Coord pos = {BOARD_WIDTH, BOARD_HEIGHT};
-    for (size_t i = 0; i < AGENTS_COUNT; ++i)
-        game->agents[i].pos = pos;
-    for (size_t i = 0; i < FOODS_COUNT; ++i)
-        game->foods[i].pos = pos;
-    for (size_t i = 0; i < WALLS_COUNT ; ++i)
-        game->walls[i].pos = pos;
             
     for (size_t i = 0; i < AGENTS_COUNT; ++i) {
         game->agents[i].pos      = random_empty_coord_on_board(game);
