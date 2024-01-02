@@ -1,8 +1,8 @@
 #ifndef GP_GAME_H_
 #define GP_GAME_H_
 
-#define BOARD_WIDTH  200
-#define BOARD_HEIGHT 200
+#define BOARD_WIDTH  100
+#define BOARD_HEIGHT 100
 
 #define ATTACK_DAMAGE        10
 #define HEALTH_MAX           100
@@ -79,6 +79,7 @@ typedef struct {
     int health;
     State state;
     int lifetime;
+    Chromo chromo;
 } Agent;
 
 const char *dir_as_cstr(Dir dir);
@@ -95,7 +96,6 @@ typedef struct {
 
 typedef struct {
     Agent agents[AGENTS_COUNT];
-    Chromo chromos[AGENTS_COUNT];
     Food foods[FOODS_COUNT];
     Wall walls[WALLS_COUNT];
 } Game;
@@ -119,6 +119,8 @@ Env env_of_agent(Game *game, size_t agent_index);
 void step_agent(Agent *agent);
 void execute_action(Game *game, size_t agent_index, Action action);
 void step_game(Game *game);
-void dump_best(Game *game);
+
+int compare_agents_lifetimes(const void *a, const void *b);
+void print_best_agents(FILE *stream, Game *game, size_t n);
 
 #endif // GP_GAME_H_
