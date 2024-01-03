@@ -1,8 +1,8 @@
 #ifndef GP_GAME_H_
 #define GP_GAME_H_
 
-#define BOARD_WIDTH  10
-#define BOARD_HEIGHT 10
+#define BOARD_WIDTH  200
+#define BOARD_HEIGHT 200
 
 #define ATTACK_DAMAGE        10
 #define HEALTH_MAX           100
@@ -10,10 +10,10 @@
 #define HUNGER_MAX           100
 #define STEP_HUNGER_DAMAGE   5
 
-#define AGENTS_COUNT 4
-#define FOODS_COUNT  3
-#define WALLS_COUNT  3
-#define GENES_COUNT  20
+#define AGENTS_COUNT 2000
+#define FOODS_COUNT  1000
+#define WALLS_COUNT  500
+#define GENES_COUNT  10
 #define STATE_COUNT  7
 
 #define MUTATION_PROB    5
@@ -113,7 +113,7 @@ typedef struct {
     Agent agents[AGENTS_COUNT];
     Food  foods[FOODS_COUNT];
     Wall  walls[WALLS_COUNT];
-    Ent   gameboard[BOARD_WIDTH * BOARD_HEIGHT];
+    Ent   gameboard[BOARD_WIDTH][BOARD_HEIGHT];
 } Game;
 
 const char *env_as_cstr(Env env);
@@ -133,7 +133,7 @@ Coord coord_infront_of_agent(const Agent *agent);
 
 Ent env_of_agent(Game *game, size_t agent_index);
 
-void step_agent(Agent *agent);
+void step_agent(Game *game, Agent *agent);
 void execute_action(Game *game, size_t agent_index, Action action);
 void step_game(Game *game);
 
