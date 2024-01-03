@@ -1,8 +1,8 @@
 #ifndef GP_GAME_H_
 #define GP_GAME_H_
 
-#define BOARD_WIDTH  200
-#define BOARD_HEIGHT 200
+#define BOARD_WIDTH  100
+#define BOARD_HEIGHT 100
 
 #define ATTACK_DAMAGE        10
 #define HEALTH_MAX           100

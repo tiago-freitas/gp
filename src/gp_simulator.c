@@ -44,9 +44,9 @@ int main(void)
 
     int quit = 0;
     int current = 0;
-    srand(time(0));
-    init_game(&games[current]);
-    // load_game();
+    // srand(time(0));
+    // init_game(&games[current]);
+    load_game(TRAINED_FILEPATH, &games[current]);
     while (!quit) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -64,6 +64,10 @@ int main(void)
 
                 case SDLK_r: {
                     init_game(&games[current]);
+                } break;
+
+                case SDLK_p: {
+                    print_best_agents(stdout, &games[current], SELECTION_POOL);
                 } break;
 
                 case SDLK_n: {

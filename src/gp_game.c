@@ -292,9 +292,9 @@ void mate_agents(const Agent *parent1, const Agent *parent2, Agent *child)
            parent1->chromo.genes,
            length);
 
-    // memcpy(child->chromo.genes + (length - 2*sizeof(Gene)),
-    //        parent2->chromo.genes + (length - 2*sizeof(Gene)),
-    //        length);
+    memcpy(child->chromo.genes + length,
+           parent2->chromo.genes + length,
+           length);
 }
 
 void mutate_agent(Agent *agent)
@@ -327,7 +327,7 @@ void make_new_generation(Game *prev_game, Game *next_game)
     }
 
     for (size_t i = 0; i < WALLS_COUNT ; ++i) {
-        Coord pos = prev_game->foods[i].pos;
+        Coord pos = prev_game->walls[i].pos;
         next_game->walls[i].pos = pos;
 
         next_game->gameboard[pos.x][pos.y].type = ENV_WALL;

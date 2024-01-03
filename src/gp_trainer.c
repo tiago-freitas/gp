@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
         current = next;
     }
 
-    // dump_game(TRAINED_FILEPATH, &games[current]);
+    dump_game(TRAINED_FILEPATH, &games[current]);
 
     return 0;
 }
