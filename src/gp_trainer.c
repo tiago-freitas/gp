@@ -7,13 +7,9 @@
 #include "./gp_random.c"
 #include "./gp_game.c"
 
-#define DUMP_FILEPATH "./game.bin"
-#define TRAINED_FILEPATH "./trained.bin"
-#define MAX_GENERATIONS 1000
-
 Game games[2] = {0};
 
-const char *shift(int *argc, char ***argv)
+const char *shift(int *argc, const char ***argv)
 {
     assert(*argc > 0);
     const char *result = **argv;
@@ -22,22 +18,33 @@ const char *shift(int *argc, char ***argv)
     return result;
 }
 
-int main(int argc, char const *argv[])
+void usage(FILE *stream)
 {
-    (void) argv;
-    (void) argc;
-    // if (argc < 3) {
-    //     fprintf(stderr, "Usage: ./gp_trainer <generations-count> <output.bin>\n");
-    //     fprintf(stderr, "ERROR: output filepath is not provided\n");
-    // }
+    fprintf(stream, "Usage: ./gp_trainer <generations-count> <output.bin>\n");
+}
+
+int main(int argc, const char *argv[])
+{
+    shift(&argc, &argv);
+
+    if (argc == 0) {
+        usage(stderr);
+        fprintf(stderr, "ERROR: number of generation is not provided\n");
+        exit(1);
+    }
+    int generations_count = atoi(shift(&argc, &argv));
+
+    if (argc == 0) {
+        usage(stderr);
+        fprintf(stderr, "ERROR: output filepath is not provided\n");
+        exit(1);
+    }
+    const char *output_filepath = shift(&argc, &argv);
 
     srand(time(0));
-
     int current = 0;
     init_game(&games[current]);
-    // load_game(DUMP_FILEPATH, &games[current]);
-
-    for (int i = 0; i < MAX_GENERATIONS; ++i)
+    for (int i = 0; i < generations_count; ++i)
     {
         printf("Generation %d... ", i);
         fflush(stdout);
@@ -53,7 +60,7 @@ int main(int argc, char const *argv[])
         current = next;
     }
 
-    dump_game(TRAINED_FILEPATH, &games[current]);
+    dump_game(output_filepath, &games[current]);
 
     return 0;
 }

@@ -14,9 +14,32 @@
 #define TRAINED_FILEPATH "./trained.bin"
 #define MAX_GENERATIONS 10
 
-Game games[2] = {0};
-int main(void)
+const char *shift(int *argc, const char ***argv)
 {
+    assert(*argc > 0);
+    const char *result = **argv;
+    *argc -= 1;
+    *argv += 1;
+    return result;
+}
+
+void usage(FILE *stream)
+{
+    fprintf(stream, "./gp_simulator <input.bin>\n");
+}
+Game games[2] = {0};
+
+int main(int argc, const char *argv[])
+{
+    shift(&argc, &argv);
+
+    if (argc == 0) {
+        usage(stderr);
+        fprintf(stderr, "ERROR: input filepath is not provided\n");
+        exit(1);
+    }
+    const char *input_filepath = shift(&argc, &argv);
+
     putenv((char *)"SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR=0");
     
     scc(SDL_Init(SDL_INIT_VIDEO));
@@ -44,9 +67,8 @@ int main(void)
 
     int quit = 0;
     int current = 0;
-    // srand(time(0));
-    // init_game(&games[current]);
-    load_game(TRAINED_FILEPATH, &games[current]);
+    load_game(input_filepath, &games[current]);
+
     while (!quit) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -62,23 +84,25 @@ int main(void)
                     step_game(&games[current]);
                 } break;
 
-                case SDLK_r: {
-                    init_game(&games[current]);
-                } break;
-
                 case SDLK_p: {
                     print_best_agents(stdout, &games[current], SELECTION_POOL);
                 } break;
 
-                case SDLK_n: {
-                    int next = 1 - current; // flip flop 1 | 0
-                    make_new_generation(&games[current], &games[next]);
-                    current = next;
-                } break;
+                // case SDLK_r: {
+                //     init_game(&games[current]);
+                // } break;
 
-                case SDLK_d: {
-                    dump_game(DUMP_FILEPATH, &games[current]);
-                } break;
+
+                // case SDLK_n: {
+                //     int next = 1 - current; // flip flop 1 | 0
+                //     make_new_generation(&games[current], &games[next]);
+                //     current = next;
+                // } break;
+
+                // case SDLK_d: {
+                //     dump_game(DUMP_FILEPATH, &games[current]);
+                // } break;
+                
                 } 
             } break;
 

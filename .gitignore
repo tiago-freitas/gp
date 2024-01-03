@@ -1,4 +1,3 @@
 gp_trainer
 gp_simulator
-game.bin
-trained.bin
+*.bin
